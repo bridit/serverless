@@ -27,6 +27,8 @@ class Application
 
     $app->addErrorMiddleware((env('APP_ENV') === 'local'), true, true);
 
+    $app->addBodyParsingMiddleware();
+
     $app->getRouteCollector()
       ->setDefaultInvocationStrategy(new \Slim\Handlers\Strategies\RequestResponseArgs())
 //  ->setCacheFile(__DIR__ . '/../bootstrap/cache/http-routes.cache')
