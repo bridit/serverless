@@ -13,6 +13,24 @@ if (! function_exists('path')) {
   }
 }
 
+if (! function_exists('config')) {
+  /**
+   * @param string $key
+   * @param mixed|null $default
+   * @return mixed
+   */
+  function config(string $key, mixed $default = null): mixed
+  {
+    $parts = explode('.', $key);
+
+    $file = array_shift($parts);
+
+    $config = require path("/config/$file.php");
+
+    return \Illuminate\Support\Arr::get($config, implode('.', $parts), $default);
+  }
+}
+
 if (!function_exists('unaccent')) {
 
   function unaccent(string $value): string
