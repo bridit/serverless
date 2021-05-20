@@ -15,7 +15,7 @@ class Log extends AbstractLogger
     $this->stderrLogger = new StderrLogger();
   }
 
-  public function log($level, $message, array $context = array())
+  public function log($level, $message, array $context = []): void
   {
     $this->stderrLogger->{$level}($message, $context);
   }

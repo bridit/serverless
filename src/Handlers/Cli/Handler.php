@@ -1,5 +1,8 @@
 <?php declare(strict_types=1);
 
+namespace Bridit\Serverless\Handlers\Cli;
+
+use Exception;
 use Bref\Context\Context;
 
 class Handler implements \Bref\Event\Handler

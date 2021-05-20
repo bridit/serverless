@@ -1,15 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Bridit\Serverless;
+namespace Bridit\Serverless\Handlers\Http;
 
 use Slim\App;
 use DI\Container;
 use Dotenv\Dotenv;
 use Slim\Factory\AppFactory;
 
-class Application
+class Handler
 {
 
+  /**
+   * @var \Slim\App $slim
+   */
   protected App $slim;
 
   public function __construct()
