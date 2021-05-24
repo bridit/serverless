@@ -31,6 +31,42 @@ if (! function_exists('config')) {
   }
 }
 
+
+if (! function_exists('request')) {
+  /**
+   * @param string|array|null $key
+   * @param mixed|null $default
+   * @return mixed
+   */
+  function request(string|array $key = null, mixed $default = null): mixed
+  {
+    $request = \Bridit\Serverless\Http\Request::fromGlobals();
+
+    if (is_null($key)) {
+      return $request;
+    }
+
+    if (is_array($key)) {
+      return $request->only($key);
+    }
+
+    return $request->get($key, $default);
+  }
+}
+
+if (! function_exists('response')) {
+  /**
+   * @param string $content
+   * @param int $status
+   * @param array $headers
+   * @return \Bridit\Serverless\Http\Response
+   */
+  function response(string $content = '', int $status = 200, array $headers = []): \Bridit\Serverless\Http\Response
+  {
+    return new \Bridit\Serverless\Http\Response($status, $headers, $content);
+  }
+}
+
 if (!function_exists('unaccent')) {
 
   function unaccent(string $value): string

@@ -6,6 +6,7 @@ use Slim\App;
 use DI\Container;
 use Dotenv\Dotenv;
 use Slim\Factory\AppFactory;
+use Bridit\Serverless\Http\Request;
 
 class Handler
 {
@@ -15,8 +16,15 @@ class Handler
    */
   protected App $slim;
 
-  public function __construct()
+  /**
+   * Handler constructor.
+   * @param string|null $basePath
+   */
+  public function __construct(string $basePath = null)
   {
+
+    define('__BASE_PATH__', $basePath ?? realpath(__DIR__ . '/../../../../../..'));
+
     if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
       mb_parse_str(urldecode($_SERVER['QUERY_STRING']), $_GET);
     }
@@ -44,7 +52,7 @@ class Handler
 
   public function run(): void
   {
-    $this->slim->run();
+    $this->slim->run(Request::fromGlobals());
   }
 
 }
