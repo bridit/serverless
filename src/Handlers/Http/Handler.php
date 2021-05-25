@@ -3,56 +3,81 @@
 namespace Bridit\Serverless\Handlers\Http;
 
 use Slim\App;
-use DI\Container;
-use Dotenv\Dotenv;
-use Slim\Factory\AppFactory;
+use Exception;
+use Bref\Context\Context;
 use Bridit\Serverless\Http\Request;
+use DI\Bridge\Slim\Bridge as SlimBridge;
 
-class Handler
+class Handler extends \Bridit\Serverless\Handlers\Handler
 {
 
-  /**
-   * @var \Slim\App $slim
-   */
-  protected App $slim;
+  protected ?App $slim = null;
+
+  protected array $middleware = [];
+
+  public function withMiddleware(array $middleware): static
+  {
+    $this->middleware = $middleware;
+
+    return $this;
+  }
 
   /**
-   * Handler constructor.
-   * @param string|null $basePath
+   * @throws Exception
    */
-  public function __construct(string $basePath = null)
+  protected function bootSlim()
   {
 
-    define('__BASE_PATH__', $basePath ?? realpath(__DIR__ . '/../../../../../..'));
+    $app = SlimBridge::create($this->getContainer());
 
-    if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
-      mb_parse_str(urldecode($_SERVER['QUERY_STRING']), $_GET);
-    }
+    $this->bootMiddleware($app);
+    $this->bootRouter($app);
 
-    $dotenv = Dotenv::createImmutable(path());
-    $dotenv->safeLoad();
+    $this->slim = clone $app;
 
-    $container = new Container();
+  }
 
-    $app = AppFactory::createFromContainer($container);
+  protected function bootMiddleware(App &$app)
+  {
 
     $app->addErrorMiddleware((env('APP_ENV') === 'local'), true, true);
+
+    foreach ($this->middleware as $middleware)
+    {
+      $app->addMiddleware($middleware);
+    }
+
+  }
+
+  protected function bootRouter(App &$app)
+  {
 
     $app->addBodyParsingMiddleware();
 
     $app->getRouteCollector()
       ->setDefaultInvocationStrategy(new \Slim\Handlers\Strategies\RequestResponseArgs())
-//  ->setCacheFile(__DIR__ . '/../bootstrap/cache/http-routes.cache')
+//      ->setCacheFile(__DIR__ . '/../bootstrap/cache/http-routes.cache')
     ;
 
     require path('/routes/http.php');
 
-    $this->slim = clone $app;
   }
 
-  public function run(): void
+  public function handle($event = null, Context $context = null)
   {
-    $this->slim->run(Request::fromGlobals());
+
+    parent::handle($event, $context);
+
+    if (null === $this->slim) {
+      $this->bootSlim();
+    }
+
+    try {
+      $this->slim->run(Request::fromGlobals());
+    } catch (Exception $e) {
+      throw $e;
+    }
+
   }
 
 }

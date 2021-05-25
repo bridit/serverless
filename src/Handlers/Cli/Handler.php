@@ -5,17 +5,19 @@ namespace Bridit\Serverless\Handlers\Cli;
 use Exception;
 use Bref\Context\Context;
 
-class Handler implements \Bref\Event\Handler
+class Handler extends \Bridit\Serverless\Handlers\Handler implements \Bref\Event\Handler
 {
 
   /**
    * @param mixed $event
-   * @param Context $context
+   * @param \Bref\Context\Context|null $context
    * @return array|mixed|void
-   * @throws Exception
+   * @throws \Exception
    */
-  public function handle($event, Context $context)
+  public function handle($event = null, Context $context = null)
   {
+    parent::handle($event, $context);
+
     $event ??= [];
 
     if (!isset($event['command'])) {
@@ -35,5 +37,3 @@ class Handler implements \Bref\Event\Handler
   }
 
 }
-
-return new Handler();
