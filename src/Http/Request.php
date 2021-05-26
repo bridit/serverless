@@ -426,4 +426,9 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
     return $this->clientIp;
   }
 
+  public function getClientUserAgent(): string
+  {
+    return $this->getServerParams()['HTTP_USER_AGENT'] ?? '';
+  }
+
 }
