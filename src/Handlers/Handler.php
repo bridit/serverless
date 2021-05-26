@@ -3,7 +3,6 @@
 namespace Bridit\Serverless\Handlers;
 
 use Bref\Context\Context;
-use Bridit\Serverless\Log;
 use Bridit\Serverless\Foundation\Application;
 
 class Handler extends Application
@@ -31,8 +30,6 @@ class Handler extends Application
     if (null === $lambdaContext) {
       return null;
     }
-
-    Log::warning(json_encode($lambdaContext));
 
     return new Context($lambdaContext['awsRequestId'], $lambdaContext['deadlineMs'], $lambdaContext['invokedFunctionArn'], $lambdaContext['traceId']);
   }
