@@ -33,12 +33,12 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
   /**
    * @var array
    */
-  private $attributes = [];
+  private array $attributes = [];
 
   /**
    * @var array
    */
-  private $cookieParams = [];
+  private array $cookieParams = [];
 
   /**
    * @var array|object|null
@@ -48,17 +48,22 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
   /**
    * @var array
    */
-  private $queryParams = [];
+  private array $queryParams = [];
 
   /**
    * @var array
    */
-  private $serverParams;
+  private array $serverParams;
 
   /**
    * @var array
    */
-  private $uploadedFiles = [];
+  private array $uploadedFiles = [];
+
+  /**
+   * @var string|null
+   */
+  private ?string $clientIp = null;
 
   /**
    * @param string                               $method       HTTP method
@@ -408,6 +413,17 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
   public function only(array|string $keys): array
   {
     return Arr::only($this->all(), $keys);
+  }
+
+  public function getClientIp(): string
+  {
+    if (null !== $this->clientIp) {
+      return $this->clientIp;
+    }
+
+    $this->clientIp = (new IpAddress(true, ['127.0.0.1']))->determineClientIpAddress($this);
+
+    return $this->clientIp;
   }
 
 }
