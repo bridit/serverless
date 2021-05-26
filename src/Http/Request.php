@@ -393,7 +393,16 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
    */
   public function all(): array
   {
-    return array_merge($this->getQueryParams() ?? [], $this->getParsedBody() ?? []);
+    return array_merge($this->queryParams ?? [], $this->parsedBody ?? []);
+  }
+
+  /**
+   * @param string|array $keys
+   * @return bool
+   */
+  public function has(string|array $keys): bool
+  {
+    return Arr::has($this->all(), $keys);
   }
 
   /**
