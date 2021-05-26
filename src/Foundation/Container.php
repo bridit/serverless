@@ -10,17 +10,17 @@ class Container extends \DI\Container implements ContainerContract
   /**
    * The current globally available container (if any).
    *
-   * @var ?ContainerContract
+   * @var ?Container
    */
-  protected static ?ContainerContract $instance = null;
+  protected static ?Container $instance = null;
 
   /**
    * Get the globally available instance of the container.
    *
    * @param mixed ...$args
-   * @return ContainerContract
+   * @return static
    */
-  public static function getInstance(...$args): ContainerContract
+  public static function getInstance(...$args): Container
   {
     if (null !== static::$instance) {
       return static::$instance;
@@ -38,10 +38,10 @@ class Container extends \DI\Container implements ContainerContract
   /**
    * Set the shared instance of the container.
    *
-   * @param  ContainerContract|null  $container
-   * @return ContainerContract|null
+   * @param  Container|null  $container
+   * @return Container|null
    */
-  public static function setInstance(ContainerContract $container = null): ?ContainerContract
+  public static function setInstance(Container $container = null): ?Container
   {
     return static::$instance = $container;
   }
