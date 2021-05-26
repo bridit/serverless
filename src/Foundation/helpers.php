@@ -58,7 +58,7 @@ if (! function_exists('request')) {
    */
   function request(string|array $key = null, mixed $default = null): mixed
   {
-    $request = \Bridit\Serverless\Http\Request::fromGlobals();
+    $request = app()->get('request');
 
     if (is_null($key)) {
       return $request;
