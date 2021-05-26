@@ -401,7 +401,7 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
    * @param mixed $default
    * @return mixed
    */
-  public function get(string $key, mixed $default): mixed
+  public function get(string $key, mixed $default = null): mixed
   {
     return Arr::get($this->all(), $key, $default);
   }
