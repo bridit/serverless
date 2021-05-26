@@ -2,16 +2,16 @@
 
 namespace Bridit\Serverless\Handlers\Http;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Slim\App;
 use Exception;
 use Bref\Context\Context;
 use Bridit\Serverless\Http\Request;
 use DI\Bridge\Slim\Bridge as SlimBridge;
+use Bridit\Serverless\Http\Middleware\BodyParsingMiddleware;
 
 class Handler extends \Bridit\Serverless\Handlers\Handler
 {
-
-  protected ?App $slim = null;
 
   protected array $middleware = [];
 
@@ -25,15 +25,16 @@ class Handler extends \Bridit\Serverless\Handlers\Handler
   /**
    * @throws Exception
    */
-  protected function bootSlim()
+  protected function getSlimInstance()
   {
 
-    $app = SlimBridge::create($this->getContainer());
+    $app = SlimBridge::create(app());
 
     $this->bootMiddleware($app);
     $this->bootRouter($app);
+    $this->bootRequest();
 
-    $this->slim = clone $app;
+    return $app;
 
   }
 
@@ -52,8 +53,6 @@ class Handler extends \Bridit\Serverless\Handlers\Handler
   protected function bootRouter(App &$app)
   {
 
-    $app->addBodyParsingMiddleware();
-
     $app->getRouteCollector()
       ->setDefaultInvocationStrategy(new \Slim\Handlers\Strategies\RequestResponseArgs())
 //      ->setCacheFile(__DIR__ . '/../bootstrap/cache/http-routes.cache')
@@ -63,20 +62,23 @@ class Handler extends \Bridit\Serverless\Handlers\Handler
 
   }
 
+  protected function bootRequest()
+  {
+    $request = (new BodyParsingMiddleware())->execute(Request::fromGlobals());
+
+    $this->set('request', fn() => $request);
+  }
+
   public function handle($event = null, Context $context = null)
   {
 
+    $context = $this->getContext($context);
+
     parent::handle($event, $context);
 
-    if (null === $this->slim) {
-      $this->bootSlim();
-    }
-
-    try {
-      $this->slim->run(Request::fromGlobals());
-    } catch (Exception $e) {
-      throw $e;
-    }
+    $this
+      ->getSlimInstance()
+      ->run($this->get('request'));
 
   }
 

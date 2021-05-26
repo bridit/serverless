@@ -16,6 +16,8 @@ class Handler extends \Bridit\Serverless\Handlers\Handler implements \Bref\Event
    */
   public function handle($event = null, Context $context = null)
   {
+    $context = $this->getContext($context);
+
     parent::handle($event, $context);
 
     $event ??= [];

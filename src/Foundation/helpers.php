@@ -13,6 +13,24 @@ if (! function_exists('path')) {
   }
 }
 
+if (! function_exists('app')) {
+  /**
+   * Get the available application instance.
+   *
+   * @param  string|null  $abstract
+   * @param  array  $parameters
+   * @return mixed|\Bridit\Serverless\Foundation\Application
+   */
+  function app($abstract = null, array $parameters = [])
+  {
+    if (is_null($abstract)) {
+      return \Bridit\Serverless\Foundation\Application::getInstance();
+    }
+
+    return \Bridit\Serverless\Foundation\Application::getInstance()->make($abstract, $parameters);
+  }
+}
+
 if (! function_exists('config')) {
   /**
    * @param string $key
@@ -23,9 +41,9 @@ if (! function_exists('config')) {
   {
     $parts = explode('.', $key);
 
-    $file = array_shift($parts);
+    $first = array_shift($parts);
 
-    $config = require path("/config/$file.php");
+    $config = app()->get($first) ?? [];
 
     return \Illuminate\Support\Arr::get($config, implode('.', $parts), $default);
   }

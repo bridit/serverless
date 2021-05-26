@@ -1,6 +1,6 @@
 <?php
 
-namespace Bridit\Serverless\Bootstrappers;
+namespace Bridit\Serverless\Foundation\Bootstrappers;
 
 use DI\Container;
 
