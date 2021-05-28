@@ -45,7 +45,9 @@ if (! function_exists('config')) {
 
     $config = app()->get($first) ?? [];
 
-    return \Illuminate\Support\Arr::get($config, implode('.', $parts), $default);
+    return !blank($parts)
+      ? \Illuminate\Support\Arr::get($config, implode('.', $parts), $default)
+      : $config;
   }
 }
 
