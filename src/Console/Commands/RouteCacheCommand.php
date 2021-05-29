@@ -1,6 +1,6 @@
 <?php
 
-namespace Bridit\Serverless\Console;
+namespace Bridit\Serverless\Console\Commands;
 
 use Slim\App;
 use FastRoute\RouteCollector;

@@ -105,7 +105,7 @@ class IpAddress
    *
    * @return ResponseInterface
    */
-  public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $next)
+  public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
   {
     if (!$next) {
       return $response;
