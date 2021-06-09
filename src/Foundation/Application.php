@@ -27,8 +27,10 @@ class Application extends Container
       mb_parse_str(urldecode($_SERVER['QUERY_STRING']), $_GET);
     }
 
-    $dotenv = Dotenv::createImmutable(path());
-    $dotenv->safeLoad();
+    if (is_readable(path('.env'))) {
+      $dotenv = Dotenv::createImmutable(path());
+      $dotenv->safeLoad();
+    }
 
     $storagePath = storage_path();
 
