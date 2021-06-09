@@ -55,6 +55,10 @@ class ProjectPermissionsCommand extends Command
     $this->executeCommand('chgrp -R ' . $this->argument('group') . ' storage bootstrap/cache');
     $this->executeCommand('chmod -R ug+rwx console storage bootstrap/cache vendor/bin vendor/bref/bref');
 
+    if (is_readable(path('/storage/oauth-private.key'))) {
+      $this->executeCommand('chmod 660 storage/oauth*.key');
+    }
+
     return self::SUCCESS;
 
   }
