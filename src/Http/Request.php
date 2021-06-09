@@ -13,6 +13,8 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use GuzzleHttp\Psr7\Request as GuzzleHttpRequest;
+use Bridit\Serverless\Http\Concerns\InteractsWithHeaders;
+use Bridit\Serverless\Http\Concerns\InteractsWithContentTypes;
 
 /**
  * Server-side HTTP request
@@ -30,6 +32,9 @@ use GuzzleHttp\Psr7\Request as GuzzleHttpRequest;
  */
 class Request extends GuzzleHttpRequest implements ServerRequestInterface
 {
+
+  use InteractsWithHeaders, InteractsWithContentTypes;
+
   /**
    * @var array
    */
@@ -66,6 +71,31 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
   private ?string $clientIp = null;
 
   /**
+   * @var array|null
+   */
+  protected ?array $languages = null;
+
+  /**
+   * @var array|null
+   */
+  protected ?array $charsets = null;
+
+  /**
+   * @var array|null
+   */
+  protected ?array $encodings = null;
+
+  /**
+   * @var array|null
+   */
+  protected ?array $acceptableContentTypes = null;
+
+  /**
+   * @var string|null
+   */
+  protected ?string $preferredFormat = null;
+
+  /**
    * @param string                               $method       HTTP method
    * @param string|UriInterface                  $uri          URI
    * @param array                                $headers      Request headers
@@ -83,7 +113,7 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
   ) {
     $this->serverParams = $serverParams;
 
-    parent::__construct($method, $uri, $headers, $body, $version);
+    parent::__construct($method, $uri, array_change_key_case($headers,CASE_LOWER), $body, $version);
   }
 
   /**
@@ -95,7 +125,7 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
    *
    * @throws InvalidArgumentException for unrecognized values
    */
-  public static function normalizeFiles(array $files)
+  public static function normalizeFiles(array $files): array
   {
     $normalized = [];
 
@@ -150,7 +180,7 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
    *
    * @return UploadedFileInterface[]
    */
-  private static function normalizeNestedFileSpec(array $files = [])
+  private static function normalizeNestedFileSpec(array $files = []): array
   {
     $normalizedFiles = [];
 
@@ -386,6 +416,26 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
     unset($new->attributes[$attribute]);
 
     return $new;
+  }
+
+  /**
+   * Determine if the request is the result of an AJAX call.
+   *
+   * @return bool
+   */
+  public function ajax()
+  {
+    return $this->isXmlHttpRequest();
+  }
+
+  /**
+   * Determine if the request is the result of a PJAX call.
+   *
+   * @return bool
+   */
+  public function pjax()
+  {
+    return $this->getHeader('X-PJAX') == true;
   }
 
   /**
