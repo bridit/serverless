@@ -2,7 +2,6 @@
 
 namespace Bridit\Serverless\Handlers\Exceptions;
 
-use Exception;
 use Throwable;
 use Slim\Handlers\ErrorHandler;
 use Slim\Exception\HttpException;
@@ -27,8 +26,8 @@ class HttpErrorHandler extends ErrorHandler
   protected function respond(): ResponseInterface
   {
     $exception = $this->exception;
-    $statusCode = 500;
-    $type = self::SERVER_ERROR;
+    $statusCode = method_exists($exception, 'getHttpStatusCode') ? $exception->getHttpStatusCode() : 500;
+    $type = method_exists($exception, 'getErrorType') ? $exception->getErrorType() : self::SERVER_ERROR;
     $description = 'An internal error has occurred while processing your request.';
 
     if ($exception instanceof HttpException) {
@@ -50,6 +49,14 @@ class HttpErrorHandler extends ErrorHandler
       }
     }
 
+    if (method_exists($exception, 'getHint')) {
+      $title = $exception->getHint();
+    } else if (method_exists($exception, 'getTitle')) {
+      $title = $exception->getTitle();
+    } else {
+      $title = strtoupper($type);
+    }
+
     if (
       !($exception instanceof HttpException)
       && ($exception instanceof Throwable)
@@ -62,7 +69,7 @@ class HttpErrorHandler extends ErrorHandler
       'errors' => [
         [
           'status' => $statusCode,
-          'title' => method_exists($exception, 'getTitle') ? $exception->getTitle() ?? $type : $type,
+          'title' => $title,
           'detail' => $description,
         ]
       ],

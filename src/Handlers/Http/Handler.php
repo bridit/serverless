@@ -100,8 +100,7 @@ class Handler extends \Bridit\Serverless\Handlers\Handler
 
     parent::handle($event, $context);
 
-    $app = $this
-      ->getSlimInstance();
+    $app = $this->getSlimInstance();
 
     $app
       ->run($this->get('request'));

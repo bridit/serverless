@@ -138,11 +138,11 @@ trait InteractsWithContentTypes
   /**
    * Determine if the given content types match.
    *
-   * @param  string  $actual
-   * @param  string  $type
+   * @param string $actual
+   * @param string $type
    * @return bool
    */
-  public static function matchesType($actual, $type): bool
+  public static function matchesType(string $actual, string $type): bool
   {
     if ($actual === $type) {
       return true;
@@ -156,10 +156,10 @@ trait InteractsWithContentTypes
   /**
    * Get the data format expected in the response.
    *
-   * @param  string  $default
+   * @param string $default
    * @return string
    */
-  public function format($default = 'html')
+  public function format(string $default = 'html'): string
   {
     foreach ($this->getAcceptableContentTypes() as $type) {
       if ($format = $this->getFormat($type)) {
