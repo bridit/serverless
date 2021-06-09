@@ -29,7 +29,7 @@ class BearerTokenMiddleware implements MiddlewareInterface
       $bearerTokenValidator = new BearerTokenValidator(new AccessTokenRepository());
 
       $request = $bearerTokenValidator
-        ->setPublicKey('/storage/oauth-public.key')
+        ->setPublicKey('oauth-public.key')
         ->validateAuthorization($request);
 
       app()->set('request', $request);

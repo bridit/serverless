@@ -52,7 +52,7 @@ class BearerTokenValidator
    */
   public function setPublicKey(string $path): static
   {
-    $this->publicKey = path($path);
+    $this->publicKey = storage_path($path);
 
     $this->initJwtConfiguration();
 
