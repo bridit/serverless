@@ -2,12 +2,13 @@
 
 namespace Bridit\Serverless\Handlers\Http;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Slim\App;
 use Exception;
 use Bref\Context\Context;
 use Bridit\Serverless\Http\Request;
 use DI\Bridge\Slim\Bridge as SlimBridge;
+use Bridit\Serverless\Handlers\Exceptions\ShutdownHandler;
+use Bridit\Serverless\Handlers\Exceptions\HttpErrorHandler;
 use Bridit\Serverless\Http\Middleware\BodyParsingMiddleware;
 
 class Handler extends \Bridit\Serverless\Handlers\Handler
@@ -25,23 +26,23 @@ class Handler extends \Bridit\Serverless\Handlers\Handler
   /**
    * @throws Exception
    */
-  protected function getSlimInstance()
+  protected function getSlimInstance(): App
   {
 
     $app = SlimBridge::create(app());
 
+    $this->bootRequest();
     $this->bootMiddleware($app);
     $this->bootRouter($app);
-    $this->bootRequest();
 
     return $app;
 
   }
 
-  protected function bootMiddleware(App &$app)
+  protected function bootMiddleware(App &$app): void
   {
 
-    $app->addErrorMiddleware((env('APP_ENV') === 'local'), true, true);
+    $this->bootErrorHandler($app);
 
     foreach ($this->middleware as $middleware)
     {
@@ -50,7 +51,29 @@ class Handler extends \Bridit\Serverless\Handlers\Handler
 
   }
 
-  protected function bootRouter(App &$app)
+  protected function bootErrorHandler(App &$app): void
+  {
+
+    $displayErrorDetails = env('APP_ENV') === 'local';
+    $callableResolver = $app->getCallableResolver();
+    $responseFactory = $app->getResponseFactory();
+
+    $request = $this->get('request');
+
+    $errorHandler = new HttpErrorHandler($callableResolver, $responseFactory);
+    $shutdownHandler = new ShutdownHandler($request, $errorHandler, $displayErrorDetails);
+    register_shutdown_function($shutdownHandler);
+
+    // Add Routing Middleware
+    $app->addRoutingMiddleware();
+
+    // Add Error Handling Middleware
+    $errorMiddleware = $app->addErrorMiddleware($displayErrorDetails, true, true);
+    $errorMiddleware->setDefaultErrorHandler($errorHandler);
+
+  }
+
+  protected function bootRouter(App &$app): void
   {
 
     $app->getRouteCollector()
@@ -62,7 +85,7 @@ class Handler extends \Bridit\Serverless\Handlers\Handler
 
   }
 
-  protected function bootRequest()
+  protected function bootRequest(): void
   {
     $request = (new BodyParsingMiddleware())->execute(Request::fromGlobals());
 
@@ -71,13 +94,16 @@ class Handler extends \Bridit\Serverless\Handlers\Handler
 
   public function handle($event = null, Context $context = null)
   {
+    $this->bootProviders();
 
     $context = $this->getContext($context);
 
     parent::handle($event, $context);
 
-    $this
-      ->getSlimInstance()
+    $app = $this
+      ->getSlimInstance();
+
+    $app
       ->run($this->get('request'));
 
   }

@@ -58,18 +58,23 @@ class HttpErrorHandler extends ErrorHandler
       $description = $exception->getMessage();
     }
 
-    $error = [
-      'statusCode' => $statusCode,
-      'error' => [
-        'type' => $type,
-        'description' => $description,
+    $body = [
+      'errors' => [
+        'status' => $statusCode,
+        'title' => method_exists($exception, 'getTitle') ? $exception->getTitle() ?? $type : $type,
+        'detail' => $description,
       ],
     ];
 
-    $payload = json_encode($error, JSON_PRETTY_PRINT);
+    $payload = json_encode($body, JSON_PRETTY_PRINT);
 
-    $response = $this->responseFactory->createResponse($statusCode);
-    $response->getBody()->write($payload);
+    $response = $this->responseFactory
+      ->createResponse($statusCode)
+      ->withHeader('Content-Type', 'application/vnd.api+json');
+
+    $response
+      ->getBody()
+      ->write($payload);
 
     return $response;
   }
