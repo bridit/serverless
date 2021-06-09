@@ -2,6 +2,7 @@
 
 namespace Bridit\Serverless\Foundation\Auth;
 
+use Exception;
 use AsyncAws\Ssm\SsmClient;
 use AsyncAws\Ssm\Input\GetParametersRequest;
 
@@ -9,7 +10,7 @@ class SSMOAuthServiceProvider
 {
 
   protected SsmClient $ssm;
-  
+
   public function __construct()
   {
     $this->ssm = new SsmClient($this->getConfig());
@@ -25,11 +26,11 @@ class SSMOAuthServiceProvider
       'region' => $config['region'],
     ];
   }
-  
+
   public function boot()
   {
-    $privateKeyPath = path('/storage/oauth-private.key');
-    $publicKeyPath = path('/storage/oauth-public.key');
+    $privateKeyPath = storage_path('/oauth-private.key');
+    $publicKeyPath = storage_path('/oauth-public.key');
 
     if (is_readable($privateKeyPath) && is_readable($publicKeyPath)) {
       return;
@@ -81,8 +82,8 @@ class SSMOAuthServiceProvider
    */
   private function saveKeys(string $privateKey, string $publicKey): void
   {
-    $privateKeyPath = path('/storage/oauth-private.key');
-    $publicKeyPath = path('/storage/oauth-public.key');
+    $privateKeyPath = storage_path('/oauth-private.key');
+    $publicKeyPath = storage_path('/oauth-public.key');
 
     file_put_contents($privateKeyPath, $privateKey);
     file_put_contents($publicKeyPath, $publicKey);

@@ -3,9 +3,8 @@
 namespace Bridit\Serverless\Foundation;
 
 use Dotenv\Dotenv;
+use Illuminate\Support\Str;
 use DI\Definition\ArrayDefinition;
-use Bridit\Serverless\Http\Request;
-use Bridit\Serverless\Handlers\Handler;
 use Bridit\Serverless\Foundation\Bootstrappers\Eloquent;
 
 class Application extends Container
@@ -30,6 +29,12 @@ class Application extends Container
 
     $dotenv = Dotenv::createImmutable(path());
     $dotenv->safeLoad();
+
+    $storagePath = storage_path();
+
+    if (! is_dir($storagePath)) {
+      mkdir($storagePath, 0755, true);
+    }
 
     return $this;
 

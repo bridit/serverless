@@ -13,6 +13,21 @@ if (! function_exists('path')) {
   }
 }
 
+if (! function_exists('storage_path')) {
+  /**
+   * Get the path to the storage of the install.
+   *
+   * @param  string  $path
+   * @return string
+   */
+  function storage_path(string $path = ''): string
+  {
+    $storagePath = \Illuminate\Support\Str::finish(env('APP_STORAGE') ?? path(), 'storage');
+
+    return $storagePath . \Illuminate\Support\Str::start($path, '/');
+  }
+}
+
 if (! function_exists('app')) {
   /**
    * Get the available application instance.
@@ -50,7 +65,6 @@ if (! function_exists('config')) {
       : $config;
   }
 }
-
 
 if (! function_exists('request')) {
   /**
