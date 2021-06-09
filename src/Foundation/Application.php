@@ -12,7 +12,9 @@ class Application extends Container
 {
 
   protected $eloquentManager;
-  
+
+  protected array $serviceProviders;
+
   /**
    * Application constructor.
    * @param string|null $basePath
@@ -47,12 +49,36 @@ class Application extends Container
     return $this;
   }
 
+  public function withProvider($provider): static
+  {
+    $this->serviceProviders[] = $provider;
+
+    return $this;
+  }
+
+  public function withProviders(array $providers): static
+  {
+    $this->serviceProviders = $providers;
+
+    return $this;
+  }
+
   protected function loadConfig(array $config)
   {
 
     foreach ($config as $fileName)
     {
       $this->set($fileName, new ArrayDefinition(require path("/config/$fileName.php")));
+    }
+
+  }
+
+  protected function bootProviders()
+  {
+
+    foreach ($this->serviceProviders as $serviceProvider)
+    {
+      $serviceProvider->boot($this);
     }
 
   }
