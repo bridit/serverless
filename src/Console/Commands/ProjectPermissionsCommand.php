@@ -53,7 +53,7 @@ class ProjectPermissionsCommand extends Command
      *  -------------------------------------------------------------------- */
     $this->info('Setting "bootstrap/cache" and "storage" group and permissions...');
     $this->executeCommand('chgrp -R ' . $this->argument('group') . ' storage bootstrap/cache');
-    $this->executeCommand('chmod -R ug+rwx cli storage bootstrap/cache vendor/bin vendor/bref/bref');
+    $this->executeCommand('chmod -R ug+rwx console storage bootstrap/cache vendor/bin vendor/bref/bref');
 
     return self::SUCCESS;
 
