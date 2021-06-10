@@ -17,10 +17,23 @@ class BearerTokenMiddleware implements MiddlewareInterface
 {
 
   /**
+   * @var array
+   */
+  protected array $scopes;
+
+  public function __construct(string|array $scope)
+  {
+    $this->scopes = is_array($scope)
+      ? $scope
+      : array_map('trim', explode(',', $scope));
+  }
+
+  /**
    * @param ServerRequestInterface $request
    * @param RequestHandlerInterface $handler
    * @return ResponseInterface
    * @throws OAuthServerException
+   * @todo Implement scope validation
    */
   public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
   {
