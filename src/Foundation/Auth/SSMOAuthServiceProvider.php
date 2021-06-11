@@ -2,10 +2,11 @@
 
 namespace Bridit\Serverless\Foundation\Auth;
 
-use Bridit\Serverless\Foundation\Providers\ServiceProvider;
-use Exception;
 use AsyncAws\Ssm\SsmClient;
 use AsyncAws\Ssm\Input\GetParametersRequest;
+use Bridit\Serverless\Foundation\Providers\ServiceProvider;
+use DI\Container;
+use Exception;
 use Illuminate\Support\Arr;
 
 class SSMOAuthServiceProvider extends ServiceProvider
@@ -14,8 +15,10 @@ class SSMOAuthServiceProvider extends ServiceProvider
   protected SsmClient $ssm;
   protected array $config;
 
-  public function __construct()
+  public function register(Container $container)
   {
+    parent::register($container);
+
     $this->config = [
       'aws' => $this->container->get('aws') ?? [],
       'auth' => $this->container->get('auth') ?? [],

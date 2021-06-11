@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
-use Platafoor\Microservices\Models\Log;
 use Ramsey\Uuid\Uuid;
 
 class EloquentHandler extends AbstractProcessingHandler

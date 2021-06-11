@@ -2,16 +2,22 @@
 
 namespace Bridit\Serverless\Foundation;
 
-use Bridit\Serverless\Foundation\Log\Log;
 use Bridit\Serverless\Foundation\Log\Logger;
-use Dotenv\Dotenv;
-use Illuminate\Support\Str;
+use Carbon\Carbon;
 use DI\Definition\ArrayDefinition;
-use Bridit\Serverless\Foundation\Bootstrappers\Eloquent;
+use Dotenv\Dotenv;
 
 class Application extends Container
 {
 
+  /**
+   * @var string[]
+   */
+  protected array $config = ['app'];
+
+  /**
+   * @var array
+   */
   protected array $serviceProviders = [];
 
   /**
@@ -42,9 +48,49 @@ class Application extends Container
 
   }
 
+  protected function bootConfig(): void
+  {
+
+    foreach (array_unique($this->config) as $config)
+    {
+      $fileName = path("/config/$config.php");
+
+      if (is_readable($fileName)) {
+        $this->set($config, new ArrayDefinition(require $fileName));
+      }
+    }
+
+  }
+
+  protected function bootLogger(): void
+  {
+    $this->set('logger', new Logger());
+  }
+
+  protected function bootProviders(): void
+  {
+
+    $this->serviceProviders = array_map(fn($item) => is_string($item) ? new $item : $item, array_merge($this->serviceProviders, config('app.providers')));
+
+    $booted = [];
+
+    foreach ($this->serviceProviders as $serviceProvider)
+    {
+      if (in_array($serviceProvider::class, $booted)) {
+        continue;
+      }
+
+      $serviceProvider->register($this);
+      $serviceProvider->boot();
+
+      $booted[] = $serviceProvider::class;
+    }
+
+  }
+
   public function withConfig(array $config): static
   {
-    $this->loadConfig($config);
+    $this->config = array_merge($this->config, $config);
 
     return $this;
   }
@@ -77,39 +123,18 @@ class Application extends Container
     return $this;
   }
 
-  protected function loadConfig(array $config)
-  {
-
-    foreach ($config as $fileName)
-    {
-      $file = path("/config/$fileName.php");
-
-      if (is_readable($file)) {
-        $this->set($fileName, new ArrayDefinition(require $file));
-      }
-    }
-
-  }
-
   public function start()
   {
+
+    $this->bootConfig();
     $this->bootLogger();
     $this->bootProviders();
-  }
 
-  protected function bootLogger()
-  {
-    $this->set('logger', new Logger());
-  }
-  
-  protected function bootProviders()
-  {
+    $appConfig = config('app');
 
-    foreach ($this->serviceProviders as $serviceProvider)
-    {
-      $serviceProvider->register($this);
-      $serviceProvider->boot();
-    }
+    date_default_timezone_set($appConfig['timezone'] ?? 'UTC');
+
+    Carbon::setLocale($appConfig['locale'] ?? $appConfig['fallback_locale'] ?? 'en');
 
   }
 
