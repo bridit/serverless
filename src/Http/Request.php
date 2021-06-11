@@ -439,6 +439,28 @@ class Request extends GuzzleHttpRequest implements ServerRequestInterface
   }
 
   /**
+   * @param string $key
+   * @param mixed $default
+   * @return mixed
+   */
+  public function header(string $key, mixed $default = null): mixed
+  {
+    $value = $this->getHeaderLine($key);
+
+    return !blank($value) ? $value : $default;
+  }
+
+  /**
+   * @param string $key
+   * @param mixed $default
+   * @return mixed
+   */
+  public function server(string $key, mixed $default = null): mixed
+  {
+    return Arr::get($this->getServerParams(), $key, $default);
+  }
+
+  /**
    * @return array
    */
   public function all(): array

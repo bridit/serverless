@@ -1,16 +1,17 @@
 <?php
 
-namespace Bridit\Serverless\Foundation\Bootstrappers;
+namespace Bridit\Serverless\Foundation\Database;
 
-use DI\Container;
+use Bridit\Serverless\Foundation\Providers\ServiceProvider;
 
-class Eloquent implements Bootstrap
+class EloquentServiceProvider extends ServiceProvider
 {
 
-  public static function load(Container $container)
+  public function boot()
   {
 
-    $databaseConfig = $container->get('database');
+    $databaseConfig = $this->container->get('database');
+    
     $default = $databaseConfig['default'];
     $connections = $databaseConfig['connections'] ?? [];
     $manager = '\Illuminate\Database\Capsule\Manager';
@@ -23,12 +24,12 @@ class Eloquent implements Bootstrap
     }
 
 //    $capsule->setEventDispatcher(new Dispatcher(new Container));
-    
+
     $capsule->setAsGlobal();
     $capsule->bootEloquent();
 
-    return $capsule;
-    
+    $this->container->set('db', $capsule);
+
   }
 
 }

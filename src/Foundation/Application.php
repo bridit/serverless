@@ -2,14 +2,15 @@
 
 namespace Bridit\Serverless\Foundation;
 
+use Bridit\Serverless\Foundation\Log\Log;
+use Bridit\Serverless\Foundation\Log\Logger;
 use Dotenv\Dotenv;
+use Illuminate\Support\Str;
 use DI\Definition\ArrayDefinition;
 use Bridit\Serverless\Foundation\Bootstrappers\Eloquent;
 
 class Application extends Container
 {
-
-  protected $eloquentManager = null;
 
   protected array $serviceProviders = [];
 
@@ -50,7 +51,14 @@ class Application extends Container
 
   public function withEloquent(): static
   {
-    $this->bootEloquent();
+    $this->serviceProviders[] = new \Bridit\Serverless\Foundation\Database\EloquentServiceProvider();
+
+    return $this;
+  }
+
+  public function withSSMOAuthKeys(): static
+  {
+    $this->serviceProviders[] = new \Bridit\Serverless\Foundation\Auth\SSMOAuthServiceProvider();
 
     return $this;
   }
@@ -74,27 +82,34 @@ class Application extends Container
 
     foreach ($config as $fileName)
     {
-      $this->set($fileName, new ArrayDefinition(require path("/config/$fileName.php")));
+      $file = path("/config/$fileName.php");
+
+      if (is_readable($file)) {
+        $this->set($fileName, new ArrayDefinition(require $file));
+      }
     }
 
   }
 
+  public function start()
+  {
+    $this->bootLogger();
+    $this->bootProviders();
+  }
+
+  protected function bootLogger()
+  {
+    $this->set('logger', new Logger());
+  }
+  
   protected function bootProviders()
   {
 
     foreach ($this->serviceProviders as $serviceProvider)
     {
-      $serviceProvider->boot($this);
+      $serviceProvider->register($this);
+      $serviceProvider->boot();
     }
-
-  }
-
-  protected function bootEloquent(): void
-  {
-
-    $this->eloquentManager = Eloquent::load($this);
-
-    $this->set('db', fn() => $this->eloquentManager);
 
   }
 

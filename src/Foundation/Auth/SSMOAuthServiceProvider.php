@@ -2,28 +2,34 @@
 
 namespace Bridit\Serverless\Foundation\Auth;
 
+use Bridit\Serverless\Foundation\Providers\ServiceProvider;
 use Exception;
 use AsyncAws\Ssm\SsmClient;
 use AsyncAws\Ssm\Input\GetParametersRequest;
+use Illuminate\Support\Arr;
 
-class SSMOAuthServiceProvider
+class SSMOAuthServiceProvider extends ServiceProvider
 {
 
   protected SsmClient $ssm;
+  protected array $config;
 
   public function __construct()
   {
-    $this->ssm = new SsmClient($this->getConfig());
+    $this->config = [
+      'aws' => $this->container->get('aws') ?? [],
+      'auth' => $this->container->get('auth') ?? [],
+    ];
+
+    $this->ssm = new SsmClient($this->getAwsConfig());
   }
 
-  private function getConfig(): array
+  private function getAwsConfig(): array
   {
-    $config = config('aws');
-
     return [
-      'accessKeyId' => $config['credentials']['key'],
-      'accessKeySecret' => $config['credentials']['secret'],
-      'region' => $config['region'],
+      'accessKeyId' => $this->config['aws']['credentials']['key'],
+      'accessKeySecret' => $this->config['aws']['credentials']['secret'],
+      'region' => $this->config['aws']['region'],
     ];
   }
 
@@ -53,8 +59,8 @@ class SSMOAuthServiceProvider
   {
 
     $keys = [
-      'private' => config('auth.jwt.ssm.private'),
-      'public' => config('auth.jwt.ssm.public'),
+      'private' => Arr::get($this->config, 'auth.jwt.ssm.private'),
+      'public' => Arr::get($this->config, 'auth.jwt.ssm.public'),
     ];
 
     $parameters = $this->ssm->getParameters(new GetParametersRequest([

@@ -2,6 +2,8 @@
 
 namespace Bridit\Serverless\Handlers\Http;
 
+use Bridit\Serverless\Foundation\Log\Log;
+use Bridit\Serverless\Foundation\Log\Logger;
 use Slim\App;
 use Exception;
 use Bref\Context\Context;
@@ -87,23 +89,17 @@ class Handler extends \Bridit\Serverless\Handlers\Handler
 
   protected function bootRequest(): void
   {
-    $request = (new BodyParsingMiddleware())->execute(Request::fromGlobals());
-
-    $this->set('request', fn() => $request);
+    $this->set('request', (new BodyParsingMiddleware())->execute(Request::fromGlobals()));
   }
 
   public function handle($event = null, Context $context = null)
   {
-    $this->bootProviders();
-
-    $context = $this->getContext($context);
-
-    parent::handle($event, $context);
 
     $app = $this->getSlimInstance();
+    
+    parent::handle($event, $context);
 
-    $app
-      ->run($this->get('request'));
+    $app->run($this->get('request'));
 
   }
 

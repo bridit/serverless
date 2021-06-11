@@ -8,9 +8,13 @@ use Bridit\Serverless\Foundation\Application;
 class Handler extends Application
 {
 
+  protected ?Context $context;
+  
   public function handle($event = null, Context $context = null)
   {
-    //
+    $this->context = $this->getContext($context);
+
+    $this->start();
   }
 
   /**
