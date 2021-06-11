@@ -2,8 +2,6 @@
 
 namespace Bridit\Serverless\Handlers\Http;
 
-use Bridit\Serverless\Foundation\Log\Log;
-use Bridit\Serverless\Foundation\Log\Logger;
 use Slim\App;
 use Exception;
 use Bref\Context\Context;
