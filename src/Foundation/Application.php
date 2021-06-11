@@ -3,16 +3,15 @@
 namespace Bridit\Serverless\Foundation;
 
 use Dotenv\Dotenv;
-use Illuminate\Support\Str;
 use DI\Definition\ArrayDefinition;
 use Bridit\Serverless\Foundation\Bootstrappers\Eloquent;
 
 class Application extends Container
 {
 
-  protected $eloquentManager;
+  protected $eloquentManager = null;
 
-  protected array $serviceProviders;
+  protected array $serviceProviders = [];
 
   /**
    * Application constructor.
