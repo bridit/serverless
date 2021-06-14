@@ -1,12 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Bridit\Serverless\Handlers;
+namespace Brid\Serverless\Handlers;
 
 use Bref\Context\Context;
 
-class Handler extends \Brid\Core\Handlers\Handler
+class Handler extends \Brid\Core\Handlers\Handler implements \Bref\Event\Handler
 {
 
+  /**
+   * @inheritDoc
+   */
   public function handle($event = null, $context = null)
   {
     $this->context = $this->getContext($context);
