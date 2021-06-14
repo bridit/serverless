@@ -3,23 +3,18 @@
 namespace Bridit\Serverless\Handlers;
 
 use Bref\Context\Context;
-use Bridit\Serverless\Foundation\Application;
 
-class Handler extends Application
+class Handler extends \Brid\Core\Handlers\Handler
 {
 
-  protected ?Context $context;
-  
-  public function handle($event = null, Context $context = null)
+  public function handle($event = null, $context = null)
   {
     $this->context = $this->getContext($context);
-
-    $this->start();
   }
 
   /**
-   * @param \Bref\Context\Context|null $context
-   * @return \Bref\Context\Context|null
+   * @param Context|null $context
+   * @return Context|null
    */
   protected function getContext(Context $context = null): ?Context
   {

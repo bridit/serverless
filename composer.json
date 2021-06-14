@@ -1,8 +1,7 @@
 {
-  "name": "bridit/serverless-php",
-  "description": "Brid-IT Serverless PHP with Bref",
-  "type": "library",
-  "license": "proprietary",
+  "name": "bridit/serverless",
+  "description": "Brid Modular Framework (Serverless with Bref)",
+  "license": "MIT",
   "authors": [
     {
       "name": "Gustavo Siqueira",
@@ -11,18 +10,9 @@
   ],
   "require": {
     "php": "^8.0",
-    "async-aws/ssm": "^1.2",
     "bref/bref": "^1.2",
     "bref/logger": "^1.0",
-    "bridit/bifrost-support": "^5.0",
-    "guzzlehttp/psr7": "^1.8",
-    "lcobucci/jwt": "^4.1",
-    "php-di/slim-bridge": "^3.1",
-    "ramsey/uuid": "^4.1",
-    "slim/csrf": "^1.2",
-    "slim/slim": "^4.0",
-    "vlucas/phpdotenv": "^5.3",
-    "monolog/monolog": "^2.2"
+    "bridit/core": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",
@@ -30,11 +20,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Bridit\\Serverless\\": "src/"
-    },
-    "files": [
-      "src/Foundation/helpers.php"
-    ]
+      "Brid\\Serverless\\": "src/"
+    }
   },
   "autoload-dev": {
     "psr-4": {
