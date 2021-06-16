@@ -1,6 +1,6 @@
 <?php
 
-namespace Brid\Serverless;
+namespace Brid\Serverless\Handlers;
 
 use Bref\Context\Context;
 use Bref\Event\InvalidLambdaEvent;
