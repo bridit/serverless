@@ -30,7 +30,7 @@ class SqsHandler extends \Brid\Sqs\SqsHandler implements \Bref\Event\Handler
    * @throws InvalidLambdaEvent
    * @throws Throwable
    */
-  public function handle($event = null, Context $context = null)
+  public function handle($event = null, $context = null)
   {
     $this->context = $this->getContext($context);
 
