@@ -12,6 +12,7 @@
     "php": "^8.0",
     "bref/bref": "^1.2",
     "bref/logger": "^1.0",
+    "bridit/console": "^1.0",
     "bridit/core": "^1.0",
     "bridit/sqs": "^1.0"
   },
